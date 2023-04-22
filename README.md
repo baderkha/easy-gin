@@ -7,7 +7,7 @@ A zero magic way to implement [DTO pattern](https://www.okta.com/identity-101/dt
 **NOTE**
 This package is meant for *REST APIs* only.
 
-Example : 
+## Why ?
 - Without easy-gin : 
 	- bad seperation of concern 
 		- doing validation and business logic
@@ -163,4 +163,57 @@ go get -u github.com/baderkha/easy-gin/v1/easygin
 		
 	```
 
-That's it , this should now work and bind from all the different part of the http request
+That's it , this should now work and bind from all the different parts of the http request
+
+### Gin Key/Value binding
+
+You might be thinking , what if you had an object that is passed by a middleware via `ctx.Set(_key,_value)` ? 
+
+This package will allow you to also bind from that object (*key word being object , you cannot use a **primitive** value*)
+
+Example
+
+```go
+type LoginInfo struct {
+	UserID string // must have the same name as your dto field
+}
+
+type UserInput struct {
+	UserID string
+}
+
+func (u UserInput) Validate() error {
+	if u.UserID == "" {
+		return errors.New("user id not set")
+	}
+	return nil
+}
+
+func (u UserInput) ValidationErrorFormat(err error) any {
+	return map[string]any{
+		"err": err.Error(),
+	}
+}
+
+
+func AuthMiddleware(ctx *gin.Context) {
+	ctx.Set("user_login_info", LoginInfo{
+		UserID: "123",
+	})
+	ctx.Next()
+}
+
+func HandleUsers(u UserInput) *easygin.Response {
+	return easygin.Res(u.UserID) // will return back 123 , which was passed from the auth middlewar 
+}
+
+func main() {
+	en := gin.Default()
+	// BindContext expects the key you used when you used the set function 
+	en.GET("_login_info", AuthMiddleware, easygin.To(HandleUsers, easygin.BindContext("user_login_info"))) 
+	en.Run(":80")
+}
+
+```
+
+
