@@ -65,8 +65,9 @@ Example :
     
     func main() {
       en := gin.Default()
-
-      en.POST("/:user_id", easygin.To(HandleUsers))
+      // by default the second argument is optional 
+      // if not provided it will atempt all bind methods (JSON,QUERY,URI) (this will incur a performance hit)
+      en.POST("/:user_id", easygin.To(HandleUsers,easygin.BindURI)) 
       en.Run(":80")
     }
   ```
