@@ -33,9 +33,8 @@ func HandleUsers(u UserInput) *easygin.Response {
 }
 
 func AuthMiddleware(ctx *gin.Context) {
-	ctx.Set("user_login_info", LoginInfo{
-		UserID: "123",
-	})
+	x := "user_id"
+	ctx.Set("user_login_info", &x)
 	ctx.Next()
 }
 
