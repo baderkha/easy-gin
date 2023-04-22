@@ -62,13 +62,14 @@ func withoutContexts(bindFroms []string) (nonCtx []string) {
 func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var (
-			dtoCastFrom       T
-			err               error
-			canBindAll        = len(withoutContexts(bindFrom)) == 0
+			dtoCastFrom T
+			err         error
+
 			contextKeysToBind = extractContextBinds(bindFrom)
+			canBindAll        = len(withoutContexts(bindFrom)) == 0
 		)
 
-		if canBindAll || SliceContains(bindFrom, BindJSON) {
+		if ctx.Request.Body != http.NoBody && canBindAll || SliceContains(bindFrom, BindJSON) {
 			err = ctx.BindJSON(&dtoCastFrom)
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, dtoCastFrom.ValidationErrorFormat(err))

@@ -2,15 +2,17 @@ package main
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/baderkha/easy-gin/v1/easygin"
 	"github.com/gin-gonic/gin"
 )
 
+type LoginInfo struct {
+	UserID string // must have the same name as your dto field
+}
+
 type UserInput struct {
-	UserID            string `json:"user_id" uri:"user_id"`
-	SomethingInTheWay string `json:"something_in_the_way" form:"q"`
+	UserID string `json:"user_id" uri:"user_id"`
 }
 
 func (u UserInput) Validate() error {
@@ -27,11 +29,18 @@ func (u UserInput) ValidationErrorFormat(err error) any {
 }
 
 func HandleUsers(u UserInput) *easygin.Response {
-	return easygin.Res(u).Status(http.StatusNotFound)
+	return easygin.Res(u.UserID) // will return back 123
+}
+
+func AuthMiddleware(ctx *gin.Context) {
+	ctx.Set("user_login_info", LoginInfo{
+		UserID: "123",
+	})
+	ctx.Next()
 }
 
 func main() {
 	en := gin.Default()
-	en.GET("/:user_id", easygin.To(HandleUsers, easygin.BindJSON, easygin.BindQuery))
+	en.GET("_login_info", AuthMiddleware, easygin.To(HandleUsers, easygin.BindContext("user_login_info")))
 	en.Run(":80")
 }
