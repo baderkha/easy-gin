@@ -91,7 +91,7 @@ Example :
   ```
  
 ## Installation 
-*Note* you need atleast golang 1.8 and above to install this utility as under the hood it uses generics
+*Note* you need golang v1.8 and above to install this utility as under the hood it uses generics
 ```
 go get -u github.com/baderkha/easy-gin/v1/easygin
 ```
