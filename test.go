@@ -32,6 +32,6 @@ func HandleUsers(u UserInput) *easygin.Response {
 
 func main() {
 	en := gin.Default()
-	en.GET("/:user_id", easygin.To(HandleUsers))
+	en.GET("/:user_id", easygin.To(HandleUsers, easygin.BindJSON, easygin.BindQuery))
 	en.Run(":80")
 }
