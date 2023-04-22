@@ -2,7 +2,7 @@
 
 <p align="center"> <img src="./logo/logo.png" width="200px" height="200px"/> </p>
 
-A simpler way to make [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin) following the [DTO pattern](https://www.okta.com/identity-101/dto/) . 
+A simpler way to implement [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin) following the [DTO pattern](https://www.okta.com/identity-101/dto/) . 
 The goal is to have handlers that are unit testable and free of boilerplate code. 
 
 **NOTE**
