@@ -98,4 +98,70 @@ go get -u github.com/baderkha/easy-gin/v1/easygin
 
 ## Documentation
 
-### supported 
+### Quick Setup
+
+- Step 1 : Create a DTO object that implements the easygin.IRequest interface 
+
+	```go 
+	type UpdateUserRequest struct {
+		ID string `uri:"user_id"` // regular gin binding from instructions
+		Name string `json:"name"` // binds from json body
+		UserType string `form:"user_type"` // binds from query parameter
+	}
+	
+	func (u UpdateUserRequest) Validate() error {
+	   // your custom validation here , consider using a struct validator like [go-validator](https://github.com/go-playground/validator)
+	   // also you can just have your validation done via tags if it's simple stuff and just return nil here
+	   return nil
+	}
+	
+	func (u UpdateUserRequest) ValidationErrorFormat(err error) any {
+		// if you want your response to be the error string return
+		return err.Error()
+		// if you want your response to be a wrapped with an object (map option)
+		return map[string]any{
+			"err":err.Error()
+		}
+		// if you want your response to be a wrapped with an object (struct option)
+		return struct {
+			Error   string `json:"err"`
+			Message string `json:"server_message"`
+		}{
+			Error:   err.Error(),
+			Message: "failed validation",
+		}
+	}
+	```
+- Step 2 : Create your easygin Handler
+	``` go
+	// argument must not be a pointer !
+	func HandleUserUpdate(u UpdateUserRequest) *easygin.Response {
+		// process the data 
+		// ....
+		
+		// once ready to respond to client
+		res := easygin.Res(map[string]any{"wow":"ok"})
+		
+		return res // this will default with a 200 response code 
+		
+		return res.Status(201) // you can override it yourself , so you can use this to handle errors 
+	}
+	```
+- Step 3 : Add it to your routes
+	``` go
+	func main() {
+		en := gin.Default()
+		
+		// option a default binding
+		// although this looks cleaner this will have a performance hit if you do not need to bind from everything else
+		en.PATCH("/:user_id",easygin.To(HandleUserUpdate)) 
+		
+		// option b recommended
+		// only bind from ...
+		// preferable  ,always define where you're binding from
+		en.PATCH("/:user_id",easygin.To(HandleUserUpdate,easygin.BindURI,easygin.BindJSON,easygin.BindQuery))
+	}
+		
+	```
+
+That's it , this should now work and bind from all the different part of the http request
