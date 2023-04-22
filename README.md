@@ -179,7 +179,7 @@ type LoginInfo struct {
 }
 
 type UserInput struct {
-	UserID string `json:"user_id" uri:"user_id"`
+	UserID string
 }
 
 func (u UserInput) Validate() error {
