@@ -39,6 +39,7 @@ Example :
   ```
  - Easy gin way : seperation of concern and easy input output with your own objects , making it easy to test !
   ``` go
+    var _ easygin.IRequest = &UserInput{} // this struct implements IRequest 
     type UserInput struct {
       UserID            string `json:"user_id" uri:"user_id"` // still use the bind methods from gin !
     }
@@ -58,6 +59,7 @@ Example :
     
     func HandleUsers(u UserInput) *easygin.Response {
       // do something with the input ...
+      // focus on your domain logic rather than validation ...etc
       return easygin.
         Res(fmt.Sprintf("user with id %s has been processed",u.UserID)).
         Status(http.StatusOK)
