@@ -6,7 +6,12 @@ A simpler way to make [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin
 The goal is to have handlers that are easily unit testable for restful api projects . 
 
 Example : 
-- Old Fashion way : bad seperation of concern not easily testable because of the context object
+- Old Fashion way : 
+	- bad seperation of concern 
+		- doing validation and business logic
+	- not easily unit testable without having to either wrap the context or use an http recorder
+	- repetitive code with binds and checking error ..etc
+	
 
   ```go
    type UserInput struct {
@@ -37,7 +42,15 @@ Example :
 	    })
     }
   ```
- - Easy gin way : seperation of concern and easy input output with your own objects , making it easy to test !
+ - easy-gin way : 
+ 	- unit testable
+ 		- your test is input output 
+ 		- no need to mock or use external recorders ..etc 
+ 	- seperation of concern 
+ 		- validation is handled by the UserInput DTO
+ 		- Business Logic is handled by the handler  
+
+
   ``` go
     var _ easygin.IRequest = &UserInput{} // this struct implements IRequest 
     type UserInput struct {
