@@ -2,11 +2,14 @@
 
 <p align="center"> <img src="./logo/logo.png" width="200px" height="200px"/> </p>
 
-A simpler way to make [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin) following the [DTO pattern](https://www.okta.com/identity-101/dto/) for the requests. 
-The goal is to have handlers that are easily unit testable for restful api projects . 
+A simpler way to make [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin) following the [DTO pattern](https://www.okta.com/identity-101/dto/) . 
+The goal is to have handlers that are unit testable and free of boilerplate code. 
+
+**NOTE**
+This package is meant for REST APIs only using the Gin framework.
 
 Example : 
-- Old Fashion way : 
+- Without easy-gin : 
 	- bad seperation of concern 
 		- doing validation and business logic
 	- not easily unit testable without having to either wrap the context or use an http recorder
