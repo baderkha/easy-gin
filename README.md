@@ -2,11 +2,10 @@
 
 <p align="center"> <img src="./logo/logo.png" width="200px" height="200px"/> </p>
 
-A No magic simple way to implement [Gin  REST HTTP handlers](https://github.com/gin-gonic/gin) following the [DTO pattern](https://www.okta.com/identity-101/dto/) . 
-The goal is to have handlers that are unit testable and free of boilerplate code. 
+A zero magic way to implement [DTO pattern](https://www.okta.com/identity-101/dto/) with the [Gin Framework](https://github.com/gin-gonic/gin). 
 
 **NOTE**
-This package is meant for REST APIs only using the Gin framework.
+This package is meant for *REST APIs* only.
 
 Example : 
 - Without easy-gin : 
