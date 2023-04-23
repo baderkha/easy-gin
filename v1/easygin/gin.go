@@ -97,6 +97,7 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 			val, exists := ctx.Get(cKey)
 			if !exists {
 				fmt.Println("warning!! context key == " + cKey + " does not exist")
+				continue
 			}
 			err := copier.Copy(&dtoCastFrom, val)
 			if err != nil {

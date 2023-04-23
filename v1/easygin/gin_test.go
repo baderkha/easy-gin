@@ -67,7 +67,8 @@ func MockInboundRequest(m *MockRequestInput) *gin.Context {
 }
 
 type dummyJSONOnly struct {
-	Name string `json:"name" form:"name" uri:"name"`
+	Name  string `json:"name" form:"name" uri:"name"`
+	Other int    `json:"other" form:"other" uri:"other" binding:"ne=10"`
 }
 
 func (d dummyJSONOnly) Validate() error {
@@ -178,6 +179,28 @@ func TestTo(t *testing.T) {
 				assert.Equal(t, `"baderkha"`, w.Body.String())
 			}
 
+			// no mode specify , failure gin validation , not custom // should error
+			{
+				w := httptest.NewRecorder()
+				ctx := GetTestGinContext(w)
+				gCtx := MockInboundRequest(&MockRequestInput{
+					Ctx:        ctx,
+					HTTPMethod: http.MethodGet,
+					QueryParams: map[string][]string{
+						"name": {
+							"baderkha",
+						},
+						"other": {
+							"10",
+						},
+					},
+				})
+				ginFunc := To(handler)
+				ginFunc(gCtx)
+				assert.Equal(t, http.StatusBadRequest, w.Code)
+				assert.MatchRegex(t, w.Body.String(), "Error")
+			}
+
 			// query mode specify // ok , should output
 			{
 				w := httptest.NewRecorder()
@@ -220,6 +243,30 @@ func TestTo(t *testing.T) {
 				assert.Equal(t, `"baderkha"`, w.Body.String())
 			}
 
+			// no mode specify , failure gin validation , not custom // should error
+			{
+				w := httptest.NewRecorder()
+				ctx := GetTestGinContext(w)
+				gCtx := MockInboundRequest(&MockRequestInput{
+					Ctx:        ctx,
+					HTTPMethod: http.MethodGet,
+					PathParams: []gin.Param{
+						{
+							Key:   "name",
+							Value: "baderkha",
+						},
+						{
+							Key:   "other",
+							Value: "10",
+						},
+					},
+				})
+				ginFunc := To(handler)
+				ginFunc(gCtx)
+				assert.Equal(t, http.StatusBadRequest, w.Code)
+				assert.MatchRegex(t, w.Body.String(), "Error")
+			}
+
 			// uri mode specify // ok , should output
 			{
 				w := httptest.NewRecorder()
@@ -244,24 +291,66 @@ func TestTo(t *testing.T) {
 		// test case 4 set / get struct binding
 		{
 
-			w := httptest.NewRecorder()
-			ctx := GetTestGinContext(w)
-			gCtx := MockInboundRequest(&MockRequestInput{
-				Ctx:         ctx,
-				HTTPMethod:  http.MethodGet,
-				QueryParams: make(url.Values),
-				KeyValueMiddlewareSet: map[string]any{
-					"some_mwr": struct {
-						Name string
-					}{
-						Name: "baderkha",
+			// regular struct , this should work and we should have the value passed to our dto handler
+			{
+				w := httptest.NewRecorder()
+				ctx := GetTestGinContext(w)
+				gCtx := MockInboundRequest(&MockRequestInput{
+					Ctx:         ctx,
+					HTTPMethod:  http.MethodGet,
+					QueryParams: make(url.Values),
+					KeyValueMiddlewareSet: map[string]any{
+						"some_mwr": struct {
+							Name string
+						}{
+							Name: "baderkha",
+						},
 					},
-				},
-			})
-			ginFunc := To(handler, BindContext("some_mwr"))
-			ginFunc(gCtx)
-			assert.Equal(t, 305, w.Code)
-			assert.Equal(t, `"baderkha"`, w.Body.String())
+				})
+				ginFunc := To(handler, BindContext("some_mwr"))
+				ginFunc(gCtx)
+				assert.Equal(t, 305, w.Code)
+				assert.Equal(t, `"baderkha"`, w.Body.String())
+			}
+
+			// regular struct key does not exist, this should work but the value will be empty
+			{
+				w := httptest.NewRecorder()
+				ctx := GetTestGinContext(w)
+				gCtx := MockInboundRequest(&MockRequestInput{
+					Ctx:         ctx,
+					HTTPMethod:  http.MethodGet,
+					QueryParams: make(url.Values),
+					KeyValueMiddlewareSet: map[string]any{
+						"some_mwr": struct {
+							Name string
+						}{
+							Name: "baderkha",
+						},
+					},
+				})
+				ginFunc := To(handler, BindContext("some_mwr2"))
+				ginFunc(gCtx)
+				assert.Equal(t, http.StatusBadRequest, w.Code)
+			}
+
+			// map should not bind and should throw an error
+			{
+				w := httptest.NewRecorder()
+				ctx := GetTestGinContext(w)
+				gCtx := MockInboundRequest(&MockRequestInput{
+					Ctx:         ctx,
+					HTTPMethod:  http.MethodGet,
+					QueryParams: make(url.Values),
+					KeyValueMiddlewareSet: map[string]any{
+						"some_mwr": nil,
+					},
+				})
+				ginFunc := To(handler, BindContext("some_mwr"))
+				ginFunc(gCtx)
+				assert.Equal(t, http.StatusInternalServerError, w.Code)
+				assert.NotEqual(t, `"baderkha"`, w.Body.String())
+			}
 
 		}
 
