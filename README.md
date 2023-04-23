@@ -216,4 +216,8 @@ func main() {
 
 ```
 
+### Method Documentation
+
+[Click here](https://pkg.go.dev/github.com/baderkha/easy-gin/v1/easygin)
+
 
