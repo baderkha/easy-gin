@@ -1,5 +1,5 @@
 # easy-gin
-
+<img src="https://img.shields.io/badge/Test Coverage-94.4%25-brightgreen"/>
 <p align="center"> <img src="./logo/logo.png" width="200px" height="200px"/> </p>
 
 A zero magic way to implement [DTO pattern](https://www.okta.com/identity-101/dto/) with the [Gin Framework](https://github.com/gin-gonic/gin). 
