@@ -119,6 +119,7 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 		responseCode := res.HTTPStatusCode
 		if responseCode == 0 {
 			responseCode = MethodToStatusCode[ctx.Request.Method]
+			res.HTTPStatusCode = responseCode
 		}
 		ctx.JSON(responseCode, res.JSONDATA())
 	}

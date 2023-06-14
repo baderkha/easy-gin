@@ -19,8 +19,8 @@ func genDefaultMsg(statusCode int) string {
 }
 
 type StandardResponse struct {
-	Data    interface{}
-	Message string
+	Data    interface{} `json:"data"`
+	Message string      `json:"messsage"`
 }
 
 var (
