@@ -72,7 +72,7 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 		if ctx.Request.Body != http.NoBody && canBindAll || SliceContains(bindFrom, BindJSON) {
 			err = ctx.BindJSON(&dtoCastFrom)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, dtoCastFrom.ValidationErrorFormat(err))
+				ctx.JSON(http.StatusBadRequest, requestErrorWraper(err))
 				return
 			}
 		}
@@ -80,7 +80,7 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 		if canBindAll || SliceContains(bindFrom, BindQuery) {
 			err = ctx.BindQuery(&dtoCastFrom)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, dtoCastFrom.ValidationErrorFormat(err))
+				ctx.JSON(http.StatusBadRequest, requestErrorWraper(err))
 				return
 			}
 		}
@@ -88,7 +88,7 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 		if canBindAll || SliceContains(bindFrom, BindURI) {
 			err = ctx.BindUri(&dtoCastFrom)
 			if err != nil {
-				ctx.JSON(http.StatusBadRequest, dtoCastFrom.ValidationErrorFormat(err))
+				ctx.JSON(http.StatusBadRequest, requestErrorWraper(err))
 				return
 			}
 		}
@@ -108,18 +108,18 @@ func To[T IRequest](inputFunc func(reqDTO T) *Response, bindFrom ...string) gin.
 
 		err = dtoCastFrom.Validate()
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, dtoCastFrom.ValidationErrorFormat(err))
+			ctx.JSON(http.StatusBadRequest, requestErrorWraper(err))
 			return
 		}
 		res := inputFunc(dtoCastFrom)
 		if res == nil {
-			ctx.JSON(http.StatusInternalServerError, dtoCastFrom.ValidationErrorFormat(errors.New("No response in bdoy")))
+			ctx.JSON(http.StatusInternalServerError, requestErrorWraper(errors.New("No response in bdoy")))
 			return
 		}
 		responseCode := res.HTTPStatusCode
 		if responseCode == 0 {
 			responseCode = MethodToStatusCode[ctx.Request.Method]
 		}
-		ctx.JSON(responseCode, res.Data)
+		ctx.JSON(responseCode, res.JSONDATA())
 	}
 }
